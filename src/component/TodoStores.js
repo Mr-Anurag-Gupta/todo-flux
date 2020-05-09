@@ -9,18 +9,44 @@ let tododb = [
     id: shortid.generate(),
     complete: false,
     text: "Perform operations through OneIM for RACF mainframe system",
+    date: new Date().toLocaleDateString(),
   },
   {
     id: shortid.generate(),
     complete: false,
     text: "Optimize the workdayhr source code for better performance",
+    date: new Date().toLocaleDateString(),
   },
   {
     id: shortid.generate(),
     complete: true,
     text: "Update support after successfull smoke test in Production",
+    date: new Date().toLocaleDateString(),
+  },
+  {
+    id: shortid.generate(),
+    complete: false,
+    text:
+      "Update support on SFSHR feature to add dateOfBirth field to employees endpoint",
+    date: new Date().toLocaleDateString(),
+  },
+  {
+    id: shortid.generate(),
+    complete: false,
+    text:
+      "Update support on SFSHR feature to return future-dated rehires along with prehire and existing employees records (employees endpoint)",
+    date: new Date().toLocaleDateString(),
+  },
+  {
+    id: shortid.generate(),
+    complete: true,
+    text:
+      "Update support on SFSHR feature to configure custom attributes for all the objects",
+    date: new Date().toLocaleDateString(),
   },
 ];
+
+let history = [...tododb];
 
 class Store extends EventEmitter {
   static dispatchToken;
@@ -44,6 +70,10 @@ class Store extends EventEmitter {
   getTodos() {
     return tododb;
   }
+
+  getHistories() {
+    return history;
+  }
 }
 
 const store = new Store();
@@ -54,11 +84,14 @@ store.dispatchToken = TodoDispatcher.register((action) => {
       // debugger;
       // Don't add todos with no text.
       if (!action.text) return;
-      tododb = tododb.concat({
+      const todo = {
         id: shortid.generate(),
         complete: false,
         text: action.text,
-      });
+        date: new Date().toLocaleDateString(),
+      };
+      tododb = tododb.concat(todo);
+      history = history.concat(todo);
       store.emitChange();
       break;
     case TodoActionTypes.TOGGLE_TODO:
@@ -70,6 +103,8 @@ store.dispatchToken = TodoDispatcher.register((action) => {
       store.emitChange();
       break;
     case TodoActionTypes.DELETE_TODO:
+      tododb = tododb.filter((todo) => todo.id !== action.id);
+      store.emitChange();
       break;
     default:
     // do nothing.
